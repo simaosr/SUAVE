@@ -9,9 +9,7 @@
 #   Imports
 # ---------------------------------------------------------------------
 
-import SUAVE 
-from SUAVE.Core import Units, Data 
-from SUAVE.Plots.Geometry import plot_airfoil
+from SUAVE.Plots.Geometry.Two_Dimensional import plot_airfoil
 import matplotlib.pyplot as plt  
 from SUAVE.Methods.Geometry.Two_Dimensional.Cross_Section.Airfoil\
      import import_airfoil_geometry, compute_airfoil_properties, convert_airfoil_to_meshgrid
