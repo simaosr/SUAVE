@@ -19,10 +19,12 @@
 from SUAVE.Core import Data
 from SUAVE.Components.Energy.Energy_Component import Energy_Component
 from SUAVE.Core import ContainerOrdered 
-from SUAVE.Analyses.Propulsion.Rotor_Wake_Fidelity_Zero import Rotor_Wake_Fidelity_Zero
-from SUAVE.Analyses.Propulsion.Rotor_Wake_Fidelity_One import Rotor_Wake_Fidelity_One
+
+#from DCode.Common.MFRotors.Analyses.Propulsion.Rotor_Wake_Fidelity_Zero import Rotor_Wake_Fidelity_Zero
+#from DCode.Common.MFRotors.Analyses.Propulsion.Rotor_Wake_Fidelity_One import Rotor_Wake_Fidelity_One
+
 from SUAVE.Methods.Aerodynamics.Common.Fidelity_Zero.Lift.BET_calculations \
-     import compute_airfoil_aerodynamics,compute_inflow_and_tip_loss
+     import compute_airfoil_aerodynamics, compute_inflow_and_tip_loss
 from SUAVE.Methods.Geometry.Three_Dimensional \
      import  orientation_product, orientation_transpose
 
@@ -75,6 +77,7 @@ class Rotor(Energy_Component):
         self.design_power                      = None
         self.design_thrust                     = None
         self.radius_distribution               = None
+        self.azimuthal_distribution            = None
         self.rotation                          = 1
         self.orientation_euler_angles          = [0.,0.,0.]   # This is X-direction thrust in vehicle frame
         self.ducted                            = False
@@ -396,7 +399,7 @@ class Rotor(Energy_Component):
         wake_inputs.speed_of_sounds       = a
         wake_inputs.dynamic_viscosities   = nu
 
-        va, vt = self.Wake.evaluate(self,wake_inputs,conditions)
+        va, vt, self = self.Wake.evaluate(self,wake_inputs,conditions)
         
         # compute new blade velocities
         Wa   = va + Ua
@@ -686,3 +689,10 @@ class Rotor(Energy_Component):
     
     def vec_to_prop_body(self):
         return self.prop_vel_to_body()
+    
+    def calculate_thickness_distribution(self):
+        self.max_thickness_distribution = np.zeros_like(self.radius_distribution)
+        for ii in range(len(self.Airfoils)):
+            t_ids = np.where(np.array(self.airfoil_polar_stations) == ii)
+            self.max_thickness_distribution[t_ids] = self.Airfoils[ii].geometry.thickness_to_chord * self.chord_distribution[t_ids]
+        return
