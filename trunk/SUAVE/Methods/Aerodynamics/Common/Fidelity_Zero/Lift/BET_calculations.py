@@ -3,8 +3,11 @@
 # 
 # Created:  Jan 2022, R. Erhard
 # Modified:       
-from SUAVE.Core.Utilities import interp2d 
 import numpy as np
+
+from SUAVE.Core.Utilities import interp2d
+
+
 ## @ingroup Methods-Aerodynamics-Common-Fidelity_Zero-Lift
 def compute_airfoil_aerodynamics(beta,c,r,R,B,Wa,Wt,a,nu,airfoils,a_loc,ctrl_pts,Nr,Na,tc,use_2d_analysis):
     """
@@ -56,7 +59,7 @@ def compute_airfoil_aerodynamics(beta,c,r,R,B,Wa,Wt,a,nu,airfoils,a_loc,ctrl_pts
     Re       = (W*c)/nu
 
     # If propeller airfoils are defined, use airfoil surrogate
-    if a_loc != None:  
+    if a_loc is not None:  
         # Compute blade Cl and Cd distribution from the airfoil data 
         if use_2d_analysis:
             # return the 2D Cl and CDval of shape (ctrl_pts, Nr, Na)
@@ -115,7 +118,7 @@ def compute_airfoil_aerodynamics(beta,c,r,R,B,Wa,Wt,a,nu,airfoils,a_loc,ctrl_pts
 
 
 
-def compute_inflow_and_tip_loss(r,R,Rh,Wa,Wt,B,et1=1,et2=1,et3=1):
+def compute_inflow_and_tip_loss(r,R,Wa,Wt,B,et1=1,et2=1,et3=1):
     """
     Computes the inflow, lamdaw, and the tip loss factor, F.
 
@@ -145,16 +148,16 @@ def compute_inflow_and_tip_loss(r,R,Rh,Wa,Wt,B,et1=1,et2=1,et3=1):
     lamdaw[lamdaw<=0.] = 1e-12
 
     tipfactor = B/2.0*(  (R/r)**et1 - 1  )**et2/lamdaw**et3 
-    hubfactor = B/2.0*(  (r/Rh)**et1 - 1  )**et2/lamdaw**et3 
+    # hubfactor = B/2.0*(  (r/Rh)**et1 - 1  )**et2/lamdaw**et3 
 
     tippiece = np.exp(-tipfactor)
-    hubpiece = np.exp(-hubfactor)
+    # hubpiece = np.exp(-hubfactor)
     Ftip = 2.*np.arccos(tippiece)/np.pi  
-    Fhub = 2.*np.arccos(hubpiece)/np.pi  
+    # Fhub = 2.*np.arccos(hubpiece)/np.pi  
     
     piece = tippiece
-    piece[tippiece<1e-3] = hubpiece[tippiece<1e-3]
+    # piece[tippiece<1e-3] = hubpiece[tippiece<1e-3]
     
-    F = Ftip * Fhub
-    F[F<1e-6] = 1e-6
+    F = Ftip #* Fhub
+    # F[F<1e-6] = 1e-6
     return lamdaw, F, piece
